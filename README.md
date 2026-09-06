@@ -1,4 +1,4 @@
-# qbehaviour_for_aitext
+# qbehaviour_deferred_for_aitext
 
 Question behaviour plugin for Moodle that extends deferred feedback to properly
 persist AI-generated grading data via the question engine API.
@@ -16,8 +16,8 @@ then reads AI results cached on the question object and writes them to the step:
 
 | Variable              | Content                                      |
 |-----------------------|----------------------------------------------|
-| `_comment`            | AI-generated feedback (HTML)                 |
-| `_commentformat`      | Format constant (`FORMAT_HTML`)              |
+| `_comment`            | AI-generated feedback (raw Markdown)         |
+| `_commentformat`      | Format constant (`FORMAT_MARKDOWN`)          |
 | `_aiprompt`           | Full prompt sent to the AI                   |
 | `_spellcheckresponse` | Grammar/spelling correction (if enabled)     |
 

@@ -62,7 +62,8 @@ class qbehaviour_deferred_for_aitext_renderer extends qbehaviour_deferredfeedbac
 
         if (!$draftitemid && $commentstep === null) {
             $aicomment = $qa->get_last_behaviour_var('_comment');
-            $commenttext = ($aicomment !== null) ? $aicomment : '';
+            // The AI comment is stored raw; render it to HTML for the editor.
+            $commenttext = $this->format_ai_comment($qa, $aicomment, $options->context);
             $commentformat = FORMAT_HTML;
             $draftitemid = file_get_unused_draft_itemid();
         } else if (!$draftitemid) {
@@ -215,7 +216,7 @@ class qbehaviour_deferred_for_aitext_renderer extends qbehaviour_deferredfeedbac
                 $output .= get_string(
                     'commentx',
                     'question',
-                    format_text($aicomment, FORMAT_HTML, ['context' => $options->context])
+                    $this->format_ai_comment($qa, $aicomment, $options->context),
                 );
             }
         }
@@ -235,5 +236,30 @@ class qbehaviour_deferred_for_aitext_renderer extends qbehaviour_deferredfeedbac
             $output .= html_writer::tag('div', $link, ['class' => 'commentlink']);
         }
         return $output;
+    }
+
+    /**
+     * Render the stored AI comment to HTML.
+     *
+     * The formatting lives in qtype_aitext, which this plugin cannot declare as a dependency (the
+     * question type already depends on it). If an older qtype_aitext without the formatter is
+     * installed, fall back to plain format_text(); the status checks in the site administration report this.
+     *
+     * @param question_attempt $qa the question attempt.
+     * @param string|null $aicomment the stored AI comment.
+     * @param context $context the context to format in.
+     * @return string HTML.
+     */
+    protected function format_ai_comment(question_attempt $qa, ?string $aicomment, context $context): string {
+        $format = $qa->get_last_behaviour_var('_commentformat');
+        if (method_exists('\\qtype_aitext\\comment_formatter', 'to_html')) {
+            return \qtype_aitext\comment_formatter::to_html($aicomment, $format, $context);
+        }
+
+        if ($aicomment === null || trim($aicomment) === '') {
+            return '';
+        }
+        $format = ($format === null || $format === '') ? FORMAT_HTML : (int) $format;
+        return format_text($aicomment, $format, ['context' => $context]);
     }
 }

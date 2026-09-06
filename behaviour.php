@@ -26,8 +26,8 @@
  * behaviour variables (_-prefixed) into the pending step before it is committed.
  * Variable naming convention used:
  * - Cached behaviour vars (_-prefix, written by apply_ai_results_to_step):
- *   _comment          The AI-generated feedback text (HTML).
- *   _commentformat    The format of the feedback (FORMAT_HTML).
+ *   _comment          The AI-generated feedback text (raw Markdown).
+ *   _commentformat    The format of the feedback (FORMAT_MARKDOWN).
  *   _aiprompt         The full rendered prompt sent to the AI.
  *   _spellcheckresponse  The AI spellcheck/grammar correction (if enabled).
  *
@@ -135,7 +135,7 @@ class qbehaviour_deferred_for_aitext extends qbehaviour_deferredfeedback {
 
         if (isset($question->lastaicomment) && $question->lastaicomment !== null) {
             $pendingstep->set_behaviour_var('_comment', $question->lastaicomment);
-            $pendingstep->set_behaviour_var('_commentformat', (string) FORMAT_HTML);
+            $pendingstep->set_behaviour_var('_commentformat', (string) FORMAT_MARKDOWN);
         }
 
         if (isset($question->lastaiprompt) && $question->lastaiprompt !== null) {
